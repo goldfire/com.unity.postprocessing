@@ -349,7 +349,11 @@ namespace UnityEngine.Rendering.PostProcessing
                 // Global volume always have influence
                 if (volume.isGlobal)
                 {
-                    postProcessLayer.OverrideSettings(settings, Mathf.Clamp01(volume.weight));
+                    float weight = Mathf.Clamp01(volume.weight);
+                    if (weight == 1f)
+                        postProcessLayer.OverrideSettings(settings);
+                    else if (weight > 0f)
+                        postProcessLayer.OverrideSettings(settings, weight);
                     continue;
                 }
 

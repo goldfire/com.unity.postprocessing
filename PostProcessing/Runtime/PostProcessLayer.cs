@@ -753,8 +753,12 @@ namespace UnityEngine.Rendering.PostProcessing
         /// <returns>The bundle for the effect of type <typeparam name="type"></typeparam></returns>
         public PostProcessBundle GetBundle(Type settingsType)
         {
-            Assert.IsTrue(m_Bundles.ContainsKey(settingsType), "Invalid type");
-            return m_Bundles[settingsType];
+            PostProcessBundle outBundle = null;
+            if (!m_Bundles.TryGetValue(settingsType, out outBundle))
+            {
+                Debug.LogError("Invalid Type");
+            }
+            return outBundle;
         }
 
         /// <summary>
@@ -785,6 +789,31 @@ namespace UnityEngine.Rendering.PostProcessing
             var renderer = bundle.CastRenderer<AmbientOcclusionRenderer>().GetMultiScaleVO();
             renderer.SetResources(m_Resources);
             renderer.GenerateAOMap(cmd, camera, destination, depthMap, invert, isMSAA);
+        }
+
+        internal void OverrideSettings(List<PostProcessEffectSettings> baseSettings)
+        {
+            // Go through all settings & overriden parameters for the given volume
+            int settingsCount = baseSettings.Count;
+            for (int j = 0; j < settingsCount; j++)
+            {
+                PostProcessEffectSettings settings = baseSettings[j];
+                if (!settings.active)
+                    continue;
+
+                var target = GetBundle(settings.GetType()).settings;
+                int count = settings.parameters.Count;
+
+                for (int i = 0; i < count; i++)
+                {
+                    var toParam = settings.parameters[i];
+                    if (toParam.overrideState)
+                    {
+                        var fromParam = target.parameters[i];
+                        fromParam.SetValue(toParam);
+                    }
+                }
+            }
         }
 
         internal void OverrideSettings(List<PostProcessEffectSettings> baseSettings, float interpFactor)
