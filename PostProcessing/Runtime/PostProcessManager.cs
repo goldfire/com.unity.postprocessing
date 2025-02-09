@@ -306,6 +306,9 @@ namespace UnityEngine.Rendering.PostProcessing
         {
             foreach (var settings in m_BaseSettings)
             {
+                if (!settings.enabled)
+                    continue;
+                
                 var target = postProcessLayer.GetBundle(settings.GetType()).settings;
                 int count = settings.parameters.Count;
 
