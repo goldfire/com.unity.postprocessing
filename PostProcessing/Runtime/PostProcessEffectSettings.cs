@@ -34,7 +34,7 @@ namespace UnityEngine.Rendering.PostProcessing
         /// The active state of the set of parameter defined in this class.
         /// </summary>
         /// <seealso cref="enabled"/>
-        public bool active = true;
+        public bool active = false;
 
         /// <summary>
         /// The true state of the effect override in the stack. Setting this to <c>false</c> will
